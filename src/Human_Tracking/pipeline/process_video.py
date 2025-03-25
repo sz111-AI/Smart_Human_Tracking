@@ -22,9 +22,9 @@ def draw_boxes_with_confidence(frame, results, color, label):
                 continue
                 
             x1, y1, x2, y2 = map(int, box)
-            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+            cv2.rectangle(frame, (x1+5, y1+5), (x2+5, y2+5), color, 1)
             text = f"{label} {confidence:.2f}"
-            cv2.putText(frame, text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv2.putText(frame, text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
     
     return frame
 
@@ -52,7 +52,6 @@ def process_video(camera_ip):
 
         # Save Best Face
         # Save best expanded face region
-        # Save upper-body image around detected face
         timestamp = time.time()
         for result in results_face:
             for box, confidence in zip(result.boxes.xyxy.cpu().numpy(), result.boxes.conf.cpu().numpy()):
@@ -65,7 +64,7 @@ def process_video(camera_ip):
                     x1, y1, x2, y2 = map(int, box)
                     
                     # Expand the bounding box to cover the upper body (30% larger)
-                    expansion_factor = 0.3  # 30% expansion
+                    expansion_factor = 0.8  # 80% expansion
                     box_width = x2 - x1
                     box_height = y2 - y1
                     expand_x = int(box_width * expansion_factor)
