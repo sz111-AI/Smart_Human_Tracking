@@ -28,13 +28,13 @@
 #     return filename
 
 #*****************************arcface
-import time
 import cv2
 import os
+import time
 
 SAVE_DIR = "data/processed/faces"
 
-def save_face(frame, box):
+def save_face(frame, box, timestamp, confidence):
     """
     Saves a face image after ensuring directory exists.
     """
@@ -46,9 +46,7 @@ def save_face(frame, box):
     if face_crop.size == 0:
         return None
 
-    filename = f"{SAVE_DIR}/face_{int(time.time())}.png"
+    filename = f"{SAVE_DIR}/face_{int(timestamp)}_{int(confidence * 100)}.png"
     cv2.imwrite(filename, face_crop)
 
     return filename
-
-

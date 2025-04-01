@@ -33,7 +33,7 @@ def calculate_quality_score(face_image, box=None):
     
     return np.clip(quality_score, 0, 1)
 
-def is_high_quality(frame, box, min_score=0.68):
+def is_high_quality(frame, box, min_score):
     """Check if face meets quality threshold"""
     quality_score = calculate_quality_score(frame, box)
     return quality_score >= min_score

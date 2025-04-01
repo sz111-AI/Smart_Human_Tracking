@@ -3,13 +3,6 @@ import insightface
 from insightface.app import FaceAnalysis
 from scipy.spatial.distance import cdist
 
-from scipy.spatial.distance import cdist
-import numpy as np
-
-from scipy.spatial.distance import cdist
-import numpy as np
-
-    
 class ArcFaceRecognizer:
     def __init__(self, model_name="buffalo_l", use_gpu=False):
         """
@@ -32,8 +25,6 @@ class ArcFaceRecognizer:
         return [face.embedding for face in embeddings if face is not None]
 
 
-    from scipy.spatial.distance import cdist
-    import numpy as np
 
     def is_duplicate(self, new_embedding, stored_embeddings, threshold=0.5):
         """
@@ -73,5 +64,3 @@ class ArcFaceRecognizer:
         
         # If any match exceeds the threshold, it's a duplicate
         return np.any(similarity > threshold)
-
-

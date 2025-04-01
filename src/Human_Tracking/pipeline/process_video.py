@@ -204,9 +204,22 @@ from src.Human_Tracking.models.arcface_recognition import ArcFaceRecognizer
 from src.Human_Tracking.utils.video_processing import resize_frame
 from src.Human_Tracking.utils.face_saving import save_face
 from src.Human_Tracking.utils.image_quality import calculate_quality_score
-from scipy.spatial.distance import cdist
+import hashlib
 
-def process_video(camera_ip, min_quality_score=0.5, quality_improvement_threshold=0.02, expansion_factor=0.8):
+def generate_face_key(embedding):
+    """
+    Generates a unique key for the face using its embedding (hash).
+    """
+    # Ensure embedding is a numpy array
+    embedding = np.array(embedding)
+    
+    # Generate the hash from the byte representation of the embedding
+    embedding_hash = hashlib.sha256(embedding.tobytes()).hexdigest()
+    
+    return embedding_hash
+
+
+def process_video(camera_ip, min_quality_score=0.7, quality_improvement_threshold=0.05, expansion_factor=0.8):
     cap = cv2.VideoCapture(camera_ip)
     if not cap.isOpened():
         print(f"❌ Error opening video source: {camera_ip}")
@@ -218,7 +231,7 @@ def process_video(camera_ip, min_quality_score=0.5, quality_improvement_threshol
     previous_faces = {}  # Track best quality per face ID
     
     frame_count = 0
-    frame_skip = 3  # Process every 3rd frame (adjust as needed)
+    frame_skip = 10  # Process every 5th frame (adjust as needed)
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -246,21 +259,24 @@ def process_video(camera_ip, min_quality_score=0.5, quality_improvement_threshol
 
                 # Check if the face quality is below the threshold
                 if quality_score < min_quality_score:
+                    print(f"⏭️ Skipping face (Q:{quality_score:.2f}), below threshold ({min_quality_score:.2f})")
                     continue  # Skip low-quality faces
 
                 # Extract ArcFace embedding
-                
                 embedding = recognizer.get_embeddings(face_crop)
                 if embedding is None:
+                    print("⏭️ Skipping embedding extraction fails")
                     continue  # Skip if embedding extraction fails
 
-                # Check if face is a duplicate
+                # Generate unique key based on the embedding (hash)
+                face_key = generate_face_key(embedding)
+
+                # Check if face is a duplicate by comparing its embedding with stored ones
                 if recognizer.is_duplicate(embedding, stored_faces):
                     print("⏭️ Skipping duplicate face")
                     continue
 
                 # Ensure high-quality image
-                face_key = tuple(map(int, box))
                 if face_key not in previous_faces:
                     previous_faces[face_key] = {'quality_score': quality_score, 'saved_path': None}
 
@@ -282,13 +298,15 @@ def process_video(camera_ip, min_quality_score=0.5, quality_improvement_threshol
                     expanded_box = (x1, y1, x2, y2)
 
                     # Save face
-                    saved_path = save_face(frame, expanded_box)
+                    saved_path = save_face(frame, expanded_box, timestamp, confidence)
                     if saved_path:
                         previous_faces[face_key] = {'quality_score': quality_score, 'saved_path': saved_path}
                         stored_faces.append(embedding)  # Save embedding to FAISS
-                        print(f"✅ Saved high-quality face: {saved_path}")
+                        print(f"✅ Saved face (Q:{quality_score:.2f} > {prev_quality + quality_improvement_threshold:.2f}, C:{confidence:.2f}): {saved_path}")
                     else:
-                        print(f"⚠️ Failed to save face")
+                        print(f"⚠️ Failed to save face (Q:{quality_score:.2f})")
+                else:
+                    print(f"⏭️ Skipping face (Q:{quality_score:.2f}), not a significant improvement (prev: {prev_quality:.2f})")
 
         # Show detection results
         cv2.imshow("Face Detection", frame)
