@@ -1,6 +1,9 @@
 import cv2
+import numpy as np
 
-def resize_frame(frame, scale_percent=200):
-    width = int(frame.shape[1] * scale_percent / 100)
-    height = int(frame.shape[0] * scale_percent / 100)
+def resize_frame(frame, scale_percent):
+    width = int(frame.shape[1] * scale_percent / 200)
+    height = int(frame.shape[0] * scale_percent / 200)
     return cv2.resize(frame, (width, height))
+
+

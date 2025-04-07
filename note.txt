@@ -2,6 +2,30 @@ export PYTHONPATH=$PYTHONPATH:/mnt/aa8c671d-b865-4400-8afd-a85038c29903/HTrackin
 
 
 
+RAM Check -- > glxinfo -B
+
+
+Ball%2024#
+B@ll%2024#
+33443
+123.231.89.2
+
+forticlient 7.0.13.0 ubuntu
+
+
+
+# 
+
+192.168.15.32
+
+192.168.15.31
+
+admin
+
+Think22wise
+
+
+
 📌 Best Solution for CCTV Live Person Identification & High-Quality Image Extraction
 
 Since registered images are clear but CCTV live images are not, the best approach is:
