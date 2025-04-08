@@ -1,5 +1,6 @@
 import cv2
 import os
+from src.Human_Tracking.utils.video_processing import resize_frame
 
 SAVE_DIR = "data/processed/faces"
 
